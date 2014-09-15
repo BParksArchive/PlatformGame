@@ -28,7 +28,7 @@ public class WorldRenderer {
 
     //Textures here
     private Texture mainTexture;
-    private Texture blockTexture;exture mapping, displaying, etc.
+    private Texture blockTexture; //texture mapping, displaying, etc.
     private boolean debug = false;
     private int width, height; //Screen size in pixels, passed by OS in resize()
     private float ppuX, ppuY; //Pixels per unit
