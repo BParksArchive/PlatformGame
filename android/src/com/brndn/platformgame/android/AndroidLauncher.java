@@ -11,13 +11,14 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+        config.useAccelerometer = false;
+        config.useCompass = false;
+        config.useWakelock = false;
+        config.useGLSurfaceView20API18 = true;
+
+
 		initialize(new PlatformGame(), config);
 	}
-
-    @Override
-    public void runOnUiThread(Runnable runnable) {
-
-    }
 
     @Override
     public void startActivity(android.content.Intent intent) {

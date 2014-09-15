@@ -28,6 +28,7 @@ public class World {
         character = new MainCharacter(new Vector2(7,2));
 
         for (int i = 0; i<10;i++) {
+            blocks.add(new SolidBlock(new Vector2(i, 0)));
             blocks.add(new SolidBlock(new Vector2(i,1)));
         }
 
@@ -35,10 +36,12 @@ public class World {
         blocks.add(new SolidBlock(new Vector2(9,3)));
         blocks.add(new SolidBlock(new Vector2(9,4)));
         blocks.add(new SolidBlock(new Vector2(9,5)));
+        blocks.add(new SolidBlock(new Vector2(9,6)));
 
         blocks.add(new SolidBlock(new Vector2(6,3)));
         blocks.add(new SolidBlock(new Vector2(6,4)));
         blocks.add(new SolidBlock(new Vector2(6,5)));
+        blocks.add(new SolidBlock(new Vector2(6,6)));
 
     }
 

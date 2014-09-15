@@ -62,7 +62,7 @@ public class MainCharacter {
     static final float SPEED = 2f;
     static final float JUMP_VELOCITY = 1f;
     static final float BOOST_VELOCITY = 5f;
-    static final float SIZE = 0.5f; //1 = 1 unit, so half a unit
+    public static final float SIZE = 0.5f; //1 = 1 unit, so half a unit
 
     Vector2 position = new Vector2();
     Vector2 acceleration = new Vector2();
