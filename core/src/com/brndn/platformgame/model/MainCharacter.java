@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Vector2;
  * Created by Brendan on 9/11/2014.
  */
 public class MainCharacter {
+
+    float stateTime = 0;
+
     public Rectangle getBounds() {
         return bounds;
     }
@@ -55,13 +58,26 @@ public class MainCharacter {
         this.state = state;
     }
 
+    public void update(float delta) {
+        stateTime += delta;
+        position.add(velocity.cpy().scl(delta));
+    }
+
+    public float getStateTime() {
+        return stateTime;
+    }
+
+    public void setStateTime(float stateTime) {
+        this.stateTime = stateTime;
+    }
+
     public enum State {
         IDLE, WALKING, JUMPING, BOOSTING, DYING
     }
 
-    static final float SPEED = 2f;
-    static final float JUMP_VELOCITY = 1f;
-    static final float BOOST_VELOCITY = 5f;
+    public static final float SPEED = 4f; //Units per second
+    public static final float JUMP_VELOCITY = 1f;
+    public static final float BOOST_VELOCITY = 5f;
     public static final float SIZE = 0.5f; //1 = 1 unit, so half a unit
 
     Vector2 position = new Vector2();

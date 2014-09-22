@@ -4,7 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.brndn.platformgame.model.MainCharacter;
@@ -19,6 +22,8 @@ public class WorldRenderer {
     private static final float CAM_WIDTH = 10f;
     private static final float CAM_HEIGHT = 7f;
 
+    private static final float RUNNING_FRAME_DURATION = 0.06f;
+
     private World world;
     private OrthographicCamera cam;
 
@@ -26,9 +31,17 @@ public class WorldRenderer {
 
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
-    //Textures here
-    private Texture mainTexture;
-    private Texture blockTexture; //texture mapping, displaying, etc.
+    //MainChar textures
+    private TextureRegion mainTexture;  //Reference to main character texture to draw
+                                        // depending on state
+    private TextureRegion mainIdleLeft;
+    private TextureRegion mainIdleRight;
+    private TextureRegion blockTexture;
+    private TextureRegion charFrame;
+
+    private Animation walkLeftAnimation;
+    private Animation walkRightAnimation;
+
     private boolean debug = false;
     private int width, height; //Screen size in pixels, passed by OS in resize()
     private float ppuX, ppuY; //Pixels per unit
@@ -38,34 +51,65 @@ public class WorldRenderer {
         this.height = h;
         ppuX = (float) width / CAM_WIDTH;
         ppuY = (float) height / CAM_HEIGHT;
+        System.out.println("hi ppux is " + ppuX + " and ppuy is " + ppuY);
     }
 
+    float angle = 300f;
+    public void testDistort() {
 
+        //System.out.println("Hello rotation world!");
+        //this.cam.position.set(CAM_WIDTH / 2f, CAM_HEIGHT / 2f, 0); //Center camera at middle of room
+        //this.cam.update();
+    }
 
     public WorldRenderer(World world, boolean debug) {
         this.world = world;
         //Shows 10 boxes on x axis, 7 boxes on Y axis
         //Results in an aspect ratio of 10:7
-        this.cam = new OrthographicCamera(CAM_WIDTH, CAM_HEIGHT); //10 units wide, 7 units tall
+        this.cam = new OrthographicCamera(CAM_WIDTH, CAM_HEIGHT); //10 units wide, 7 units tall/
         this.cam.position.set(CAM_WIDTH / 2f, CAM_HEIGHT / 2f, 0); //Center camera at middle of room
-        this.cam.update();
+
         this.debug = debug;
         spriteBatch = new SpriteBatch();
+
         loadTextures();
     }
 
     private void loadTextures() {
-        mainTexture = new Texture(Gdx.files.internal("mainchar_01.png"));
-        blockTexture = new Texture(Gdx.files.internal("solidblock.png"));
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures/textures.pack"));
+        mainIdleLeft = atlas.findRegion("mainchar01");
+        mainIdleRight = new TextureRegion(mainIdleLeft);
+        mainIdleRight.flip(true,false);
+        blockTexture = atlas.findRegion("block");
+        TextureRegion[] walkLeftFrames = new TextureRegion[5];
+
+        for (int i = 0; i < 5; i++) {
+            walkLeftFrames[i] = atlas.findRegion("mainchar0" + (i+2));
+        }
+
+        walkLeftAnimation = new Animation(RUNNING_FRAME_DURATION, walkLeftFrames);
+        TextureRegion[] walkRightFrames = new TextureRegion[5];
+        for (int i = 0; i < 5; i++) {
+            walkRightFrames[i] = new TextureRegion(walkLeftFrames[i]);
+            walkRightFrames[i].flip(true,false);
+        }
+        walkRightAnimation = new Animation(RUNNING_FRAME_DURATION, walkRightFrames);
+
+
     }
 
     public void render() {
+       // spriteBatch.setProjectionMatrix(cam.view);
         spriteBatch.begin();
+        testDistort();
+        this.cam.update();
         drawBlocks();
         drawMainCharacter();
         spriteBatch.end();
 
         if(debug) drawDebug();
+
+
     }
 
     private void drawBlocks() {
@@ -80,6 +124,29 @@ public class WorldRenderer {
 
     private void drawMainCharacter() {
         MainCharacter character = world.getMainCharacter();
+
+        float stateDelta = character.getStateTime();
+
+        switch (character.getState()) {
+            case IDLE:
+                mainTexture = character.isFacingLeft() ? mainIdleLeft : mainIdleRight;
+                break;
+            case WALKING:
+                mainTexture = character.isFacingLeft() ?
+                               walkLeftAnimation.getKeyFrame(character.getStateTime(),true) :
+                               walkRightAnimation.getKeyFrame(character.getStateTime(), true);
+                break;
+            case JUMPING:
+                mainTexture = character.isFacingLeft() ?
+                        walkLeftAnimation.getKeyFrame(character.getStateTime(),true) :
+                        walkRightAnimation.getKeyFrame(character.getStateTime(), true);
+                break;
+            case BOOSTING:
+                break;
+            case DYING:
+                break;
+        }
+
         spriteBatch.draw(mainTexture, character.getPosition().x*ppuX,
                                 character.getPosition().y*ppuY,
                                 MainCharacter.SIZE*ppuX,
